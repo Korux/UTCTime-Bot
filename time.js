@@ -11,7 +11,7 @@ bot.login(token.token);
 
 bot.on("ready",() =>{
     console.log("UTC Time Bot online");
-    interval = setInterval(function(){checkTime(jsonData);},1000);
+    interval = setInterval(function(){checkTime(jsonData);},10000);
 });
 
 bot.on('error',(err) => {
