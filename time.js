@@ -1,12 +1,13 @@
 const discord = require("discord.js");
 const bot = new discord.Client();
 const fs = require("fs");
+const token = JSON.parse(fs.readFileSync("./bottoken.json"));
 
 var channelJson = fs.readFileSync("./channels.json");
 var jsonData = JSON.parse (channelJson);
 var interval;
 
-bot.login(process.env.BOT_TOKEN);
+bot.login(token.token);
 
 bot.on("ready",() =>{
     console.log("UTC Time Bot online");
