@@ -1,2 +1,4 @@
 channels.json
 bottoken.json
+node_modules/
+*.json

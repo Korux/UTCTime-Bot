@@ -1,3 +1,12 @@
+/*
+
+** HOW TO USE **
+NAME A VOICE CHANNEL "utctimebot"
+USE THE "~~utc" COMMAND
+
+
+*/
+
 const discord = require("discord.js");
 const bot = new discord.Client();
 const fs = require("fs");
@@ -6,12 +15,14 @@ const token = JSON.parse(fs.readFileSync("./bottoken.json"));
 var channelJson = fs.readFileSync("./channels.json");
 var jsonData = JSON.parse (channelJson);
 var interval;
+var settingTime;
 
 bot.login(token.token);
 
 bot.on("ready",() =>{
     console.log("UTC Time Bot online");
-    interval = setInterval(function(){checkTime(jsonData);},10000);
+	settingTime = false;
+    interval = setInterval(function(){checkTime(jsonData);},180000);
 });
 
 bot.on('error',(err) => {
@@ -29,8 +40,8 @@ bot.on("message",(message)=>{
 
 function addChannels(){
     var count = 0;
-    bot.guilds.forEach((thisguild)=>{
-        thisguild.channels.forEach((thisch)=>{
+    bot.guilds.cache.forEach((thisguild)=>{
+        thisguild.channels.cache.forEach((thisch)=>{
             if(thisch.name == "utctimebot"){
                 if(!jsonData.includes(thisch.id)){
                     jsonData.push(thisch.id);
@@ -41,7 +52,7 @@ function addChannels(){
     });
     fs.writeFileSync("./channels.json",JSON.stringify(jsonData),null,4);
     clearInterval(interval);
-    interval = setInterval(function(){checkTime(jsonData);},10000);
+    interval = setInterval(function(){checkTime(jsonData);},180000);
     return count;
 }
 
@@ -52,12 +63,19 @@ function checkTime(jsonData){
     if (hours < 10) hours = "0" + hours;
     if (minutes < 10) minutes = "0" + minutes;
     var time = hours + ":" + minutes + " (UTC)";
-    console.log(time);
-    bot.guilds.forEach((thisguild)=>{
-        thisguild.channels.forEach((thisch)=>{
+	console.log("time is: ", time);
+	if(settingTime == false){
+		settingTime = true;
+		bot.guilds.cache.forEach((thisguild)=>{
+        thisguild.channels.cache.forEach((thisch)=>{
             if(jsonData.includes(thisch.id)){
-                thisch.setName("🕑 " + time);
+				console.log("setting time...");
+				thisch.setName("🕑 " + time).then(ch=>{
+                    console.log("promise fulfilled: "+time + " channel: " + ch);
+					settingTime = false;
+                }).catch(err=>{console.log(err)});
             }
         });
     });
+	}
 }
